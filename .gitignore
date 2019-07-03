@@ -8,7 +8,10 @@ __pycache__/
 
 # Video and data folders
 kitti_data/
+kitti_data_original/
 model_data_keras*/
+kitti_results*/
+*.hkl
 
 # Distribution / packaging
 .Python
