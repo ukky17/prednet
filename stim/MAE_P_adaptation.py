@@ -40,9 +40,9 @@ def create_circles(dotsX, dotsY):
 # stim parameters ------------------------------------------------------------
 n_movies = 10
 
-pre_frames = 0
-stim_frames = 5 # 2, 4, 8, 16, 32 sec
-post_frames = 5
+pre_frames = 10
+stim_frames = 20 # 2, 4, 8, 16, 32 sec
+post_frames = 20
 deg = 0 # 0, 180
 
 nDots = 2000
@@ -56,7 +56,7 @@ output_size = (128, 160)
 ############################ present stims  ##################################
 total_frames = pre_frames + stim_frames + post_frames
 
-filename_base = 'stims/MAE_P_deg' + str(deg)
+filename_base = 'stims_' + str(total_frames) + 'frames/MAE_P_deg' + str(deg)
 movie_filename = filename_base + '.mp4'
 img_filename = filename_base + '.hkl'
 source_filename = filename_base + '_source.hkl'
@@ -102,9 +102,9 @@ for m in range(n_movies):
 
         # save
         for ch in range(3):
-            img_all[m * n_movies + f, :, :, ch] = cv2.resize(field,
+            img_all[m * total_frames + f, :, :, ch] = cv2.resize(field,
                                               (output_size[1], output_size[0]))
-        source.append([str(m)] * total_frames)
+        source.append(str(m))
 
     if m == 0:
         writer.release()

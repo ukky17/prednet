@@ -59,7 +59,7 @@ output_size = (128, 160)
 ############################ present stims  ##################################
 total_frames = pre_frames + stim_frames + post_frames
 
-filename_base = 'stims/OF_R_' + stimtype
+filename_base = 'stims_' + str(total_frames) + 'frames/OF_R_' + stimtype
 movie_filename = filename_base + '.mp4'
 img_filename = filename_base + '.hkl'
 source_filename = filename_base + '_source.hkl'
@@ -107,9 +107,9 @@ for m in range(n_movies):
 
         # save
         for ch in range(3):
-            img_all[m * n_movies + f, :, :, ch] = cv2.resize(field,
+            img_all[m * total_frames + f, :, :, ch] = cv2.resize(field,
                                               (output_size[1], output_size[0]))
-        source.append([str(m)] * total_frames)
+        source.append(str(m))
 
     if m == 0:
         writer.release()

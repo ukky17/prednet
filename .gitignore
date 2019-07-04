@@ -11,6 +11,7 @@ kitti_data*/
 model_*/
 kitti_results*/
 *.hkl
+*.mp4
 
 # Distribution / packaging
 .Python
