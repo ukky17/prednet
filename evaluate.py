@@ -17,14 +17,17 @@ from keras.layers import Input, Dense, Flatten
 
 from prednet import PredNet
 from data_utils import SequenceGenerator
-from kitti_settings import *
 
+# path
+DATA_DIR = './kitti_data/'
+WEIGHTS_DIR = './model_50frames/'
+RESULTS_SAVE_DIR = './kitti_results_50frames/'
 
 n_plot = 40
 batch_size = 10
-nt = 10
+nt = 50
 
-weights_file = os.path.join(WEIGHTS_DIR, 'tensorflow_weights/prednet_kitti_weights.hdf5')
+weights_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_weights.hdf5')
 json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
 test_file = os.path.join(DATA_DIR, 'X_test.hkl')
 test_sources = os.path.join(DATA_DIR, 'sources_test.hkl')
