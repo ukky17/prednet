@@ -63,6 +63,7 @@ if __name__ == '__main__':
                     # ax.set_xlabel('Frames')
                     # ax.set_ylabel('Response')
                     plt.setp(ax.get_xticklabels(), visible=False)
+                    ax.set_xticks(np.arange(0, 60, 10))
                     ax.axvspan(pre_frames, pre_frames + stim_frames - 0.5,
                                 facecolor='r', alpha=0.3)
                 plt.tight_layout()
