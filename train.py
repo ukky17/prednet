@@ -20,7 +20,7 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model_50frames/'
+WEIGHTS_DIR = './model/50frames/'
 
 
 save_model = True  # if weights will be saved

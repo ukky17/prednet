@@ -84,15 +84,15 @@ if __name__ == '__main__':
     nt = pre_frames + stim_frames + post_frames
 
     # get the result path
-    RESULTS_SAVE_DIR = './response_' + str(nt) + 'frames_' + model_type + '/'
+    RESULTS_SAVE_DIR = './response/' + str(nt) + 'frames_' + model_type + '/'
 
     # get the model path
-    WEIGHTS_DIR = './model_' + str(nt) + 'frames/'
+    WEIGHTS_DIR = './model/' + str(nt) + 'frames/'
     json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
     weights_file = WEIGHTS_DIR + 'prednet_kitti_weights.hdf5'
 
     # get the data path
-    DATA_DIR = 'stim/stims_' + str(nt) + 'frames/'
+    DATA_DIR = 'stim/' + str(nt) + 'frames/'
     test_file = DATA_DIR + stim + '.hkl'
     test_sources = DATA_DIR + stim + '_source.hkl'
 

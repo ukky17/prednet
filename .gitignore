@@ -7,11 +7,11 @@ __pycache__/
 *.so
 
 # Video and data folders
-kitti_data*/
-model_*/
-kitti_results*/
-response_*/
+kitti_results/
+model/
+response/
 *.hkl
+*.npy
 *.mp4
 
 # Distribution / packaging
