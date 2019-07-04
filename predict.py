@@ -61,20 +61,18 @@ if __name__ == '__main__':
     # params
     parser = argparse.ArgumentParser()
     parser.add_argument('--n_movies', type=int, default=10)
-    parser.add_argument('--nt', type=int, default=10)
-    parser.add_argument('--pre_frames', type=int, default=0)
-    parser.add_argument('--stim_frames', type=int, default=5)
-    parser.add_argument('--post_frames', type=int, default=5)
+    parser.add_argument('--pre_frames', type=int, default=10)
+    parser.add_argument('--stim_frames', type=int, default=20)
+    parser.add_argument('--post_frames', type=int, default=20)
 
-    parser.add_argument('--model_type', type=str, default='L0',
+    parser.add_argument('--model_type', type=str, default='Lall',
                         help='L0, or Lall')
     parser.add_argument('--target', type=str, default='E0')
-    parser.add_argument('--stim', type=str, default='OF_R_in',
+    parser.add_argument('--stim', type=str, default='MAE_P_deg0',
                         help='MAE_P_deg0, MAE_P_deg180 or OF_R_out, OF_R_in')
 
     args = parser.parse_args()
     n_movies = args.n_movies
-    nt = args.nt
     pre_frames = args.pre_frames
     stim_frames = args.stim_frames
     post_frames = args.post_frames
@@ -83,25 +81,20 @@ if __name__ == '__main__':
     stim = args.stim
     print(args)
 
+    nt = pre_frames + stim_frames + post_frames
+
     # get the result path
-    RESULTS_SAVE_DIR = './kitti_results_' + model_type + '/'
+    RESULTS_SAVE_DIR = './response_' + str(nt) + 'frames_' + model_type + '/'
 
     # get the model path
-    WEIGHTS_DIR = './model_data_keras2/'
+    WEIGHTS_DIR = './model_' + str(nt) + 'frames/'
     json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
-    if model_type == 'L0':
-        weights_file = WEIGHTS_DIR + 'tensorflow_weights/prednet_kitti_weights.hdf5'
-    elif model_type == 'Lall':
-        weights_file = WEIGHTS_DIR + 'tensorflow_weights/prednet_kitti_weights-Lall.hdf5'
+    weights_file = WEIGHTS_DIR + 'prednet_kitti_weights.hdf5'
 
     # get the data path
-    DATA_DIR = 'stim/stims/'
+    DATA_DIR = 'stim/stims_' + str(nt) + 'frames/'
     test_file = DATA_DIR + stim + '.hkl'
     test_sources = DATA_DIR + stim + '_source.hkl'
-
-    # DATA_DIR = './kitti_data/'
-    # test_file = os.path.join(DATA_DIR, 'X_test.hkl')
-    # test_sources = os.path.join(DATA_DIR, 'sources_test.hkl')
 
     # model
     data_format, test_model = create_test_model(json_file, weights_file, target)
@@ -146,9 +139,9 @@ if __name__ == '__main__':
             for i in range(min(100, n_neurons - n * 100)):
                 idx = 100 * n + i
                 ax = plt.subplot(10, 10, i+1)
-                ax.errorbar(range(1, 10), np.mean(tmp1[:, :, idx], axis=0),
+                ax.errorbar(range(1, nt), np.mean(tmp1[:, :, idx], axis=0),
                             yerr=np.std(tmp1[:, :, idx], axis=0) / np.sqrt(n_movies))
-                ax.errorbar(range(1, 10), np.mean(tmp2[:, :, idx], axis=0),
+                ax.errorbar(range(1, nt), np.mean(tmp2[:, :, idx], axis=0),
                             yerr=np.std(tmp2[:, :, idx], axis=0) / np.sqrt(n_movies))
                 # ax.set_xlabel('Frames')
                 # ax.set_ylabel('Response')
@@ -160,11 +153,11 @@ if __name__ == '__main__':
 
     elif target[0] == 'E':
         fig = plt.figure()
-        plt.errorbar(range(1, 10),
+        plt.errorbar(range(1, nt),
                      np.mean(tmp1, axis=(0, 2)),
                      yerr=np.std(tmp1, axis=(0, 2)) / \
                           np.sqrt(tmp1.shape[0] * tmp1.shape[2]))
-        plt.errorbar(range(1, 10),
+        plt.errorbar(range(1, nt),
                      np.mean(tmp2, axis=(0, 2)),
                      yerr=np.std(tmp2, axis=(0, 2)) / \
                           np.sqrt(tmp2.shape[0] * tmp2.shape[2]))
