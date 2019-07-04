@@ -2,6 +2,7 @@ import hickle as hkl
 import numpy as np
 from keras import backend as K
 from keras.preprocessing.image import Iterator
+import tensorflow as tf
 
 # Data generator that creates sequences for input into PredNet.
 class SequenceGenerator(Iterator):
@@ -48,7 +49,14 @@ class SequenceGenerator(Iterator):
 
     def next(self):
         with self.lock:
-            index_array, current_index, current_batch_size = next(self.index_generator)
+            v = tf.__version__.split('.')
+            if int(v[0]) > 1 or int(v[1]) > 4:
+                # TF >= 1.4.0
+                current_index = (self.batch_index * self.batch_size) % self.n
+                index_array, current_batch_size = next(self.index_generator), self.batch_size
+            else:
+                # TF <= 1.3.0
+                index_array, current_index, current_batch_size = next(self.index_generator)
         batch_x = np.zeros((current_batch_size, self.nt) + self.im_shape, np.float32)
         for i, idx in enumerate(index_array):
             idx = self.possible_starts[idx]
