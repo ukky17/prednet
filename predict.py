@@ -64,24 +64,21 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--nt', type=int, default=50)
 
-    parser.add_argument('--model_type', type=str, default='Lall',
-                        help='L0, or Lall')
     parser.add_argument('--target', type=str, default='E0')
     parser.add_argument('--stim', type=str, default='MAE_P_deg0',
                         help='MAE_P_deg0, MAE_P_deg180 or OF_R_out, OF_R_in')
+    parser.add_argument('--SAVE_DIR', type=str, default='./response/50frames_sigmoid/')
+    parser.add_argument('--WEIGHTS_DIR', type=str, default='./model/50frames_sigmoid/')
 
     args = parser.parse_args()
     nt = args.nt
-    model_type = args.model_type
     target = args.target
     stim = args.stim
+    SAVE_DIR = args.SAVE_DIR
+    WEIGHTS_DIR = args.WEIGHTS_DIR
     print(args)
 
-    # get the result path
-    SAVE_DIR = './response/' + str(nt) + 'frames_' + model_type + '/'
-
     # get the model path
-    WEIGHTS_DIR = './model/' + str(nt) + 'frames/'
     json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
     weights_file = WEIGHTS_DIR + 'prednet_kitti_weights.hdf5'
 

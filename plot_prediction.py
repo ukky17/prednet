@@ -23,13 +23,12 @@ plt.rcParams['pdf.use14corefonts'] = True
 pre_frames = 10
 stim_frames = 20
 post_frames = 20
-model_type = 'Lall'
 _stim = 'MAE_P_'
 
 nt = pre_frames + stim_frames + post_frames
 
 if __name__ == '__main__':
-    SAVE_DIR = './response/' + str(nt) + 'frames_' + model_type + '/'
+    SAVE_DIR = './response/50frames_sigmoid/'
 
     for target in ['E0', 'E1', 'E2', 'E3', 'R0', 'R1', 'R2', 'R3']:
         resp_deg0 = hickle.load(SAVE_DIR + 'MAE_P_deg0_' + target + '.hkl')
