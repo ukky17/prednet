@@ -20,7 +20,7 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/50frames_sigmoid/'
+WEIGHTS_DIR = './model/50frames/'
 
 
 save_model = True  # if weights will be saved
@@ -56,7 +56,7 @@ time_loss_weights[0] = 0
 
 prednet = PredNet(stack_sizes, R_stack_sizes,
                   A_filt_sizes, Ahat_filt_sizes, R_filt_sizes,
-                  output_mode='error', return_sequences=True, LSTM_activation='sigmoid')
+                  output_mode='error', return_sequences=True)
 
 inputs = Input(shape=(nt,) + input_shape)
 errors = prednet(inputs)  # errors will be (batch_size, nt, nb_layers)

@@ -2,7 +2,7 @@ import os
 import argparse
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
-os.environ["CUDA_VISIBLE_DEVICES"]="2"
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import numpy as np
@@ -67,8 +67,8 @@ if __name__ == '__main__':
     parser.add_argument('--target', type=str, default='E0')
     parser.add_argument('--stim', type=str, default='MAE_P_deg0',
                         help='MAE_P_deg0, MAE_P_deg180 or OF_R_out, OF_R_in')
-    parser.add_argument('--SAVE_DIR', type=str, default='./response/50frames_sigmoid/')
-    parser.add_argument('--WEIGHTS_DIR', type=str, default='./model/50frames_sigmoid/')
+    parser.add_argument('--SAVE_DIR', type=str, default='./response/50frames/')
+    parser.add_argument('--WEIGHTS_DIR', type=str, default='./model/50frames/')
 
     args = parser.parse_args()
     nt = args.nt
