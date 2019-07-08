@@ -28,9 +28,10 @@ _stim = 'MAE_P_'
 nt = pre_frames + stim_frames + post_frames
 
 if __name__ == '__main__':
-    SAVE_DIR = './response/50frames_sigmoid/'
+    SAVE_DIR = './response/50frames/'
 
-    for target in ['E0', 'E1', 'E2', 'E3', 'R0', 'R1', 'R2', 'R3']:
+    for target in ['E0', 'E1', 'E2', 'E3', 'R0', 'R1', 'R2', 'R3',
+                   'A0', 'A1', 'A2', 'A3', 'Ahat0', 'Ahat1', 'Ahat2', 'Ahat3']:
         resp_deg0 = hickle.load(SAVE_DIR + 'MAE_P_deg0_' + target + '.hkl')
         resp_deg0_p = hickle.load(SAVE_DIR + 'MAE_P_deg0_' + target + '_permuted.hkl')
         resp_deg180 = hickle.load(SAVE_DIR + 'MAE_P_deg180_' + target + '.hkl')
@@ -41,35 +42,37 @@ if __name__ == '__main__':
         resp_deg180 = np.mean(resp_deg180, axis=(2, 3))[:, 1:, :] # (n_movies, nt-1, n_neurons)
         resp_deg180_p = np.mean(resp_deg180_p, axis=(2, 3))[:, 1:, :]
 
-        if target[0] == 'R':
-            mpl.rcParams['ytick.labelsize'] = 9
+        mpl.rcParams['ytick.labelsize'] = 9
 
-            n_neurons = resp_deg0.shape[-1]
-            n_plot = int(np.ceil(n_neurons / 100))
-            for n in range(n_plot):
-                fig = plt.figure(figsize=(20, 20))
+        n_neurons = resp_deg0.shape[-1]
+        n_plot = int(np.ceil(n_neurons / 100))
+        for n in range(n_plot):
+            fig = plt.figure(figsize=(20, 20))
 
-                for i in range(min(100, n_neurons - n * 100)):
-                    s = np.sqrt(len(resp_deg0))
-                    idx = 100 * n + i
-                    ax = plt.subplot(10, 10, i+1)
-                    ax.errorbar(range(1, nt), np.mean(resp_deg0[:, :, idx], axis=0),
-                                yerr=np.std(resp_deg0[:, :, idx], axis=0) / s,
-                                c='m')
-                    ax.errorbar(range(1, nt), np.mean(resp_deg180[:, :, idx], axis=0),
-                                yerr=np.std(resp_deg180[:, :, idx], axis=0) / s,
-                                c='c')
-                    # ax.set_xlabel('Frames')
-                    # ax.set_ylabel('Response')
-                    plt.setp(ax.get_xticklabels(), visible=False)
-                    ax.set_xticks(np.arange(0, 60, 10))
-                    ax.axvspan(pre_frames, pre_frames + stim_frames - 0.5,
-                                facecolor='r', alpha=0.3)
-                plt.tight_layout()
-                plt.savefig(SAVE_DIR + _stim + target + '_' + str(n) + '.png')
-                plt.savefig(SAVE_DIR + _stim + target + '_' + str(n) + '.pdf')
+            for i in range(min(100, n_neurons - n * 100)):
+                s = np.sqrt(len(resp_deg0))
+                idx = 100 * n + i
+                ax = plt.subplot(10, 10, i+1)
+                ax.errorbar(range(1, nt), np.mean(resp_deg0[:, :, idx], axis=0),
+                            yerr=np.std(resp_deg0[:, :, idx], axis=0) / s,
+                            c='m', alpha=0.7)
+                ax.errorbar(range(1, nt), np.mean(resp_deg180[:, :, idx], axis=0),
+                            yerr=np.std(resp_deg180[:, :, idx], axis=0) / s,
+                            c='c', alpha=0.7)
+                # ax.set_xlabel('Frames')
+                # ax.set_ylabel('Response')
+                plt.setp(ax.get_xticklabels(), visible=False)
+                ax.set_xticks(np.arange(0, 60, 10))
+                ax.axvspan(pre_frames, pre_frames + stim_frames - 0.5,
+                            facecolor='r', alpha=0.3)
+            plt.tight_layout()
+            plt.savefig(SAVE_DIR + _stim + target + '_' + str(n) + '.png')
+            plt.savefig(SAVE_DIR + _stim + target + '_' + str(n) + '.pdf')
+            plt.close()
 
-        elif target[0] == 'E':
+        if target[0] == 'E':
+            mpl.rcParams['ytick.labelsize'] = 16
+
             s = np.sqrt(resp_deg0.shape[0] * resp_deg0.shape[2])
             fig = plt.figure()
             plt.errorbar(range(1, nt), np.mean(resp_deg0, axis=(0, 2)),
@@ -90,5 +93,6 @@ if __name__ == '__main__':
             plt.axvspan(pre_frames, pre_frames + stim_frames - 0.5,
                         facecolor='r', alpha=0.3)
             plt.tight_layout()
-            plt.savefig(SAVE_DIR + _stim + target + '.png')
-            plt.savefig(SAVE_DIR + _stim + target + '.pdf')
+            plt.savefig(SAVE_DIR + _stim + target + '_mean.png')
+            plt.savefig(SAVE_DIR + _stim + target + '_mean.pdf')
+            plt.close()
