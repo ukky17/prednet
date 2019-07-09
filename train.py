@@ -22,16 +22,24 @@ from data_utils import SequenceGenerator
 DATA_DIR = './kitti_data/'
 WEIGHTS_DIR = './model/50frames/'
 
+size = (128, 192)
 
 save_model = True  # if weights will be saved
 weights_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_weights.hdf5')  # where weights will be saved
 json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
 
 # Data files
-train_file = os.path.join(DATA_DIR, 'X_train.hkl')
-train_sources = os.path.join(DATA_DIR, 'sources_train.hkl')
-val_file = os.path.join(DATA_DIR, 'X_val.hkl')
-val_sources = os.path.join(DATA_DIR, 'sources_val.hkl')
+if size == (128, 160):
+    train_file = os.path.join(DATA_DIR, 'X_train.hkl')
+    train_sources = os.path.join(DATA_DIR, 'sources_train.hkl')
+    val_file = os.path.join(DATA_DIR, 'X_val.hkl')
+    val_sources = os.path.join(DATA_DIR, 'sources_val.hkl')
+else:
+    s = str(size[0]) + 'x' + str(size[1])
+    train_file = os.path.join(DATA_DIR, 'X_train' + s + '.hkl')
+    train_sources = os.path.join(DATA_DIR, 'sources_train' + s + '.hkl')
+    val_file = os.path.join(DATA_DIR, 'X_val' + s + '.hkl')
+    val_sources = os.path.join(DATA_DIR, 'sources_val' + s + '.hkl')
 
 # Training parameters
 nb_epoch = 150
@@ -40,14 +48,18 @@ samples_per_epoch = 500
 N_seq_val = 100  # number of sequences to use for validation
 
 # Model parameters
-n_channels, im_height, im_width = (3, 128, 160)
+n_channels, im_height, im_width = (3, ) + size
 input_shape = (n_channels, im_height, im_width) if K.image_data_format() == 'channels_first' else (im_height, im_width, n_channels)
-stack_sizes = (n_channels, 48, 96, 192)
+stack_sizes = (n_channels, 48, 96)
 R_stack_sizes = stack_sizes
-A_filt_sizes = (3, 3, 3)
-Ahat_filt_sizes = (3, 3, 3, 3)
-R_filt_sizes = (3, 3, 3, 3)
-layer_loss_weights = np.array([1, 0.1, 0.1, 0.1])  # weighting for each layer in final loss; "L_0" model:  [1, 0, 0, 0], "L_all": [1, 0.1, 0.1, 0.1]
+A_filt_sizes = (3, 3)
+Ahat_filt_sizes = (3, 3, 3)
+R_filt_sizes = (3, 3, 3)
+A_stride_sizes = (1, 1)
+Ahat_stride_sizes = (1, 1, 1)
+R_stride_sizes = (1, 1, 1)
+pool_size = 8
+layer_loss_weights = np.array([1, 0.1, 0.1])  # weighting for each layer in final loss; "L_0" model:  [1, 0, 0, 0], "L_all": [1, 0.1, 0.1, 0.1]
 layer_loss_weights = np.expand_dims(layer_loss_weights, 1)
 nt = 50  # number of timesteps used for sequences in training
 time_loss_weights = 1./ (nt - 1) * np.ones((nt,1))  # equally weight all timesteps except the first
@@ -56,6 +68,7 @@ time_loss_weights[0] = 0
 
 prednet = PredNet(stack_sizes, R_stack_sizes,
                   A_filt_sizes, Ahat_filt_sizes, R_filt_sizes,
+                  A_stride_sizes, Ahat_stride_sizes, R_stride_sizes, pool_size,
                   output_mode='error', return_sequences=True)
 
 inputs = Input(shape=(nt,) + input_shape)

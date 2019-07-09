@@ -7,7 +7,9 @@ from keras.models import model_from_json
 
 legacy_prednet_support = generate_legacy_interface(
     allowed_positional_args=['stack_sizes', 'R_stack_sizes',
-                            'A_filt_sizes', 'Ahat_filt_sizes', 'R_filt_sizes'],
+                            'A_filt_sizes', 'Ahat_filt_sizes', 'R_filt_sizes',
+                            'A_stride_sizes', 'Ahat_stride_sizes',
+                            'R_stride_sizes', 'pool_size'],
     conversions=[('dim_ordering', 'data_format'),
                  ('consume_less', 'implementation')],
     value_conversions={'dim_ordering': {'tf': 'channels_last',

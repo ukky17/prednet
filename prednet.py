@@ -53,6 +53,8 @@ class PredNet(Recurrent):
             It defaults to the `image_data_format` value found in your
             Keras config file at `~/.keras/keras.json`.
 
+        ## added: A_stride_sizes, Ahat_stride_sizes, R_stride_sizes, pool_size
+
     # References
         - [Deep predictive coding networks for video prediction and unsupervised learning](https://arxiv.org/abs/1605.08104)
         - [Long short-term memory](http://deeplearning.cs.cmu.edu/pdfs/Hochreiter97_lstm.pdf)
@@ -62,6 +64,7 @@ class PredNet(Recurrent):
     @legacy_prednet_support
     def __init__(self, stack_sizes, R_stack_sizes,
                  A_filt_sizes, Ahat_filt_sizes, R_filt_sizes,
+                 A_stride_sizes, Ahat_stride_sizes, R_stride_sizes, pool_size,
                  pixel_max=1., error_activation='relu', A_activation='relu',
                  LSTM_activation='tanh', LSTM_inner_activation='hard_sigmoid',
                  output_mode='error', extrap_start_time=None,
@@ -76,6 +79,14 @@ class PredNet(Recurrent):
         self.Ahat_filt_sizes = Ahat_filt_sizes
         assert len(R_filt_sizes) == (self.nb_layers), 'len(R_filt_sizes) must equal len(stack_sizes)'
         self.R_filt_sizes = R_filt_sizes
+
+        assert len(A_stride_sizes) == (self.nb_layers - 1), 'len(A_stride_sizes) must equal len(stack_sizes) - 1'
+        self.A_stride_sizes = A_stride_sizes
+        assert len(Ahat_stride_sizes) == self.nb_layers, 'len(Ahat_stride_sizes) must equal len(stack_sizes)'
+        self.Ahat_stride_sizes = Ahat_stride_sizes
+        assert len(R_stride_sizes) == (self.nb_layers), 'len(R_stride_sizes) must equal len(stack_sizes)'
+        self.R_stride_sizes = R_stride_sizes
+        self.pool_size = pool_size
 
         self.pixel_max = pixel_max
         self.error_activation = activations.get(error_activation)
@@ -145,7 +156,7 @@ class PredNet(Recurrent):
            nlayers_to_pass['ahat'] = 1
         for u in states_to_pass:
             for l in range(nlayers_to_pass[u]):
-                ds_factor = 2 ** l
+                ds_factor = self.pool_size ** l
                 nb_row = init_nb_row // ds_factor
                 nb_col = init_nb_col // ds_factor
                 if u in ['r', 'c']:
@@ -182,16 +193,33 @@ class PredNet(Recurrent):
         for l in range(self.nb_layers):
             for c in ['i', 'f', 'c', 'o']:
                 act = self.LSTM_activation if c == 'c' else self.LSTM_inner_activation
-                self.conv_layers[c].append(Conv2D(self.R_stack_sizes[l], self.R_filt_sizes[l], padding='same', activation=act, data_format=self.data_format))
+                self.conv_layers[c].append(Conv2D(self.R_stack_sizes[l],
+                                                  (self.R_filt_sizes[l], self.R_filt_sizes[l]),
+                                                  strides=self.R_stride_sizes[l],
+                                                  padding='same',
+                                                  activation=act,
+                                                  data_format=self.data_format))
 
             act = 'relu' if l == 0 else self.A_activation
-            self.conv_layers['ahat'].append(Conv2D(self.stack_sizes[l], self.Ahat_filt_sizes[l], padding='same', activation=act, data_format=self.data_format))
+            self.conv_layers['ahat'].append(Conv2D(self.stack_sizes[l],
+                                                   (self.Ahat_filt_sizes[l], self.Ahat_filt_sizes[l]),
+                                                   strides=self.Ahat_stride_sizes[l],
+                                                   padding='same',
+                                                   activation=act,
+                                                   data_format=self.data_format))
 
             if l < self.nb_layers - 1:
-                self.conv_layers['a'].append(Conv2D(self.stack_sizes[l+1], self.A_filt_sizes[l], padding='same', activation=self.A_activation, data_format=self.data_format))
+                self.conv_layers['a'].append(Conv2D(self.stack_sizes[l+1],
+                                                    (self.A_filt_sizes[l], self.A_filt_sizes[l]),
+                                                    strides=self.A_stride_sizes[l],
+                                                    padding='same',
+                                                    activation=self.A_activation,
+                                                    data_format=self.data_format))
 
-        self.upsample = UpSampling2D(data_format=self.data_format)
-        self.pool = MaxPooling2D(data_format=self.data_format)
+        self.upsample = UpSampling2D((self.pool_size, self.pool_size),
+                                     data_format=self.data_format)
+        self.pool = MaxPooling2D((self.pool_size, self.pool_size),
+                                 data_format=self.data_format)
 
         self.trainable_weights = []
         nb_row, nb_col = (input_shape[-2], input_shape[-1]) if self.data_format == 'channels_first' else (input_shape[-3], input_shape[-2])
@@ -299,6 +327,10 @@ class PredNet(Recurrent):
                   'A_filt_sizes': self.A_filt_sizes,
                   'Ahat_filt_sizes': self.Ahat_filt_sizes,
                   'R_filt_sizes': self.R_filt_sizes,
+                  'A_stride_sizes': self.A_stride_sizes,
+                  'Ahat_stride_sizes': self.Ahat_stride_sizes,
+                  'R_stride_sizes': self.R_stride_sizes,
+                  'pool_size': self.pool_size,
                   'pixel_max': self.pixel_max,
                   'error_activation': self.error_activation.__name__,
                   'A_activation': self.A_activation.__name__,
