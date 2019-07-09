@@ -48,6 +48,10 @@ samples_per_epoch = 500
 N_seq_val = 100  # number of sequences to use for validation
 
 # Model parameters
+"""
+size % (pool_size ** len(stack_size)) must be 0 (otherwize UpSampling2D and MaxPooling2D processes cause error)
+stride sizes must be 1
+"""
 n_channels, im_height, im_width = (3, ) + size
 input_shape = (n_channels, im_height, im_width) if K.image_data_format() == 'channels_first' else (im_height, im_width, n_channels)
 stack_sizes = (n_channels, 48, 96)
