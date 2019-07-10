@@ -3,6 +3,7 @@ Train PredNet on KITTI sequences. (Geiger et al. 2013, http://www.cvlibs.net/dat
 '''
 
 import os
+import shutil
 import numpy as np
 np.random.seed(123)
 from six.moves import cPickle
@@ -20,13 +21,16 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/50frames/'
+WEIGHTS_DIR = './model/50frames_3layers/'
 
 size = (128, 192)
 
 save_model = True  # if weights will be saved
 weights_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_weights.hdf5')  # where weights will be saved
 json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
+
+shutil.copy('prednet.py', WEIGHTS_DIR)
+shutil.copy('train.py', WEIGHTS_DIR)
 
 # Data files
 if size == (128, 160):
