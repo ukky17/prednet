@@ -21,7 +21,7 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/50frames_3layers/'
+WEIGHTS_DIR = './model/190711_1/'
 
 size = (128, 192)
 
@@ -29,6 +29,7 @@ save_model = True  # if weights will be saved
 weights_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_weights.hdf5')  # where weights will be saved
 json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
 
+os.makedirs(WEIGHTS_DIR)
 shutil.copy('prednet.py', WEIGHTS_DIR)
 shutil.copy('train.py', WEIGHTS_DIR)
 
@@ -58,15 +59,22 @@ stride sizes must be 1
 """
 n_channels, im_height, im_width = (3, ) + size
 input_shape = (n_channels, im_height, im_width) if K.image_data_format() == 'channels_first' else (im_height, im_width, n_channels)
-stack_sizes = (n_channels, 48, 96)
+stack_sizes = (n_channels, 96, 192)
 R_stack_sizes = stack_sizes
-A_filt_sizes = (3, 3)
+
+s1 = 2
+s2 = 4
+k1 = 3
+k2 = s2
+
+A_filt_sizes = (k1, k1)
 Ahat_filt_sizes = (3, 3, 3)
 R_filt_sizes = (3, 3, 3)
-A_stride_sizes = (1, 1)
+A_stride_sizes = (s1, s1)
 Ahat_stride_sizes = (1, 1, 1)
 R_stride_sizes = (1, 1, 1)
-pool_size = 8
+pool_size = s2
+upsample_size = s1 * s2
 layer_loss_weights = np.array([1, 0.1, 0.1])  # weighting for each layer in final loss; "L_0" model:  [1, 0, 0, 0], "L_all": [1, 0.1, 0.1, 0.1]
 layer_loss_weights = np.expand_dims(layer_loss_weights, 1)
 nt = 50  # number of timesteps used for sequences in training
@@ -76,7 +84,7 @@ time_loss_weights[0] = 0
 
 prednet = PredNet(stack_sizes, R_stack_sizes,
                   A_filt_sizes, Ahat_filt_sizes, R_filt_sizes,
-                  A_stride_sizes, Ahat_stride_sizes, R_stride_sizes, pool_size,
+                  A_stride_sizes, Ahat_stride_sizes, R_stride_sizes, pool_size, upsample_size,
                   output_mode='error', return_sequences=True)
 
 inputs = Input(shape=(nt,) + input_shape)

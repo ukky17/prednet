@@ -64,7 +64,7 @@ class PredNet(Recurrent):
     @legacy_prednet_support
     def __init__(self, stack_sizes, R_stack_sizes,
                  A_filt_sizes, Ahat_filt_sizes, R_filt_sizes,
-                 A_stride_sizes, Ahat_stride_sizes, R_stride_sizes, pool_size,
+                 A_stride_sizes, Ahat_stride_sizes, R_stride_sizes, pool_size, upsample_size,
                  pixel_max=1., error_activation='relu', A_activation='relu',
                  LSTM_activation='tanh', LSTM_inner_activation='hard_sigmoid',
                  output_mode='error', extrap_start_time=None,
@@ -87,6 +87,7 @@ class PredNet(Recurrent):
         assert len(R_stride_sizes) == (self.nb_layers), 'len(R_stride_sizes) must equal len(stack_sizes)'
         self.R_stride_sizes = R_stride_sizes
         self.pool_size = pool_size
+        self.upsample_size = upsample_size
 
         self.pixel_max = pixel_max
         self.error_activation = activations.get(error_activation)
@@ -156,7 +157,7 @@ class PredNet(Recurrent):
            nlayers_to_pass['ahat'] = 1
         for u in states_to_pass:
             for l in range(nlayers_to_pass[u]):
-                ds_factor = self.pool_size ** l
+                ds_factor = self.upsample_size ** l
                 nb_row = init_nb_row // ds_factor
                 nb_col = init_nb_col // ds_factor
                 if u in ['r', 'c']:
@@ -216,7 +217,7 @@ class PredNet(Recurrent):
                                                     activation=self.A_activation,
                                                     data_format=self.data_format))
 
-        self.upsample = UpSampling2D((self.pool_size, self.pool_size),
+        self.upsample = UpSampling2D((self.upsample_size, self.upsample_size),
                                      data_format=self.data_format)
         self.pool = MaxPooling2D((self.pool_size, self.pool_size),
                                  data_format=self.data_format)
