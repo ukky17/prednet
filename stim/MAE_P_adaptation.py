@@ -45,18 +45,22 @@ stim_frames = 20 # 2, 4, 8, 16, 32 sec
 post_frames = 20
 deg = 0 # 0, 180
 
-nDots = 2000
+nDots = 1700 # 2000, 2400, 1700
 maxSpeed = 40 # pixel/frame
 dotSize = 15
-winsize = (1280, 1600)
+winsize = (1080, 1620) # (1280, 1600), (1280, 1920), (1080, 1620)
 limit = int(np.sqrt(winsize[0] ** 2 + winsize[1] ** 2))
 
-output_size = (128, 160)
+output_size = (108, 162) # (128, 160), (128, 192), (108, 162)
 
 ############################ present stims  ##################################
 total_frames = pre_frames + stim_frames + post_frames
 
-filename_base = 'stims_' + str(total_frames) + 'frames/MAE_P_deg' + str(deg)
+filename_base = str(total_frames) + 'frames'
+if output_size == (128, 160):
+    filename_base += '/MAE_P_deg' + str(deg)
+else:
+    filename_base += str(output_size[0]) + 'x' + str(output_size[1]) + '/MAE_P_deg' + str(deg)
 movie_filename = filename_base + '.mp4'
 img_filename = filename_base + '.hkl'
 source_filename = filename_base + '_source.hkl'
