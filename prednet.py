@@ -332,6 +332,7 @@ class PredNet(Recurrent):
                   'Ahat_stride_sizes': self.Ahat_stride_sizes,
                   'R_stride_sizes': self.R_stride_sizes,
                   'pool_size': self.pool_size,
+                  'upsample_size': self.upsample_size,
                   'pixel_max': self.pixel_max,
                   'error_activation': self.error_activation.__name__,
                   'A_activation': self.A_activation.__name__,
