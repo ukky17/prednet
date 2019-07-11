@@ -20,17 +20,16 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/50frames/'
-RESULTS_SAVE_DIR = './kitti_results/50frames/'
+WEIGHTS_DIR = './model/190711_3/'
+RESULTS_SAVE_DIR = './kitti_results/190711_3/'
 
 n_plot = 40
 batch_size = 10
 nt = 50
 
+os.makedirs(RESULTS_SAVE_DIR)
 weights_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_weights.hdf5')
 json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
-test_file = os.path.join(DATA_DIR, 'X_test.hkl')
-test_sources = os.path.join(DATA_DIR, 'sources_test.hkl')
 
 # Load trained model
 f = open(json_file, 'r')
@@ -49,6 +48,15 @@ input_shape[0] = nt
 inputs = Input(shape=tuple(input_shape))
 predictions = test_prednet(inputs)
 test_model = Model(inputs=inputs, outputs=predictions)
+
+# data load
+if input_shape[1] == 128 and input_shape[2] == 160:
+    test_file = os.path.join(DATA_DIR, 'X_test.hkl')
+    test_sources = os.path.join(DATA_DIR, 'sources_test.hkl')
+else:
+    s = str(input_shape[1]) + 'x' + str(input_shape[2])
+    test_file = os.path.join(DATA_DIR, 'X_test' + s + '.hkl')
+    test_sources = os.path.join(DATA_DIR, 'sources_test' + s + '.hkl')
 
 test_generator = SequenceGenerator(test_file, test_sources, nt, sequence_start_mode='unique', data_format=data_format)
 X_test = test_generator.create_all()
