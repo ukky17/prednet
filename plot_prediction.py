@@ -28,10 +28,10 @@ _stim = 'MAE_P_'
 nt = pre_frames + stim_frames + post_frames
 
 if __name__ == '__main__':
-    SAVE_DIR = './response/50frames/'
+    SAVE_DIR = './response/190711_2/'
 
-    for target in ['E0', 'E1', 'E2', 'E3', 'R0', 'R1', 'R2', 'R3',
-                   'A0', 'A1', 'A2', 'A3', 'Ahat0', 'Ahat1', 'Ahat2', 'Ahat3']:
+    for target in ['E0', 'E1', 'E2', 'R0', 'R1', 'R2',
+                   'A0', 'A1', 'A2', 'Ahat0', 'Ahat1', 'Ahat2']:
         resp_deg0 = hickle.load(SAVE_DIR + 'MAE_P_deg0_' + target + '.hkl')
         resp_deg0_p = hickle.load(SAVE_DIR + 'MAE_P_deg0_' + target + '_permuted.hkl')
         resp_deg180 = hickle.load(SAVE_DIR + 'MAE_P_deg180_' + target + '.hkl')

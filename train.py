@@ -21,7 +21,7 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/190711_1/'
+WEIGHTS_DIR = './model/190711_2/'
 
 size = (128, 192)
 
@@ -64,7 +64,7 @@ R_stack_sizes = stack_sizes
 
 s1 = 2
 s2 = 4
-k1 = 3
+k1 = 4
 k2 = s2
 
 A_filt_sizes = (k1, k1)

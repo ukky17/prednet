@@ -51,7 +51,7 @@ def create_test_model(json_file, weights_file, target):
     inputs = Input(shape=tuple(input_shape))
     predictions = test_prednet(inputs)
     test_model = Model(inputs=inputs, outputs=predictions)
-    return data_format, test_model
+    return input_shape, data_format, test_model
 
 def convert_to_ratio(_X_hat):
     _X_hat_ratio = np.zeros_like(_X_hat)
@@ -67,8 +67,8 @@ if __name__ == '__main__':
     parser.add_argument('--target', type=str, default='E0')
     parser.add_argument('--stim', type=str, default='MAE_P_deg0',
                         help='MAE_P_deg0, MAE_P_deg180 or OF_R_out, OF_R_in')
-    parser.add_argument('--SAVE_DIR', type=str, default='./response/50frames/')
-    parser.add_argument('--WEIGHTS_DIR', type=str, default='./model/50frames/')
+    parser.add_argument('--SAVE_DIR', type=str, default='./response/190711_2/')
+    parser.add_argument('--WEIGHTS_DIR', type=str, default='./model/190711_2/')
 
     args = parser.parse_args()
     nt = args.nt
@@ -78,17 +78,24 @@ if __name__ == '__main__':
     WEIGHTS_DIR = args.WEIGHTS_DIR
     print(args)
 
+    if not os.path.exists(SAVE_DIR):
+        os.makedirs(SAVE_DIR)
+
     # get the model path
     json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
     weights_file = WEIGHTS_DIR + 'prednet_kitti_weights.hdf5'
 
+    # model
+    input_shape, data_format, test_model = create_test_model(json_file, weights_file, target)
+
     # get the data path
-    DATA_DIR = 'stim/' + str(nt) + 'frames/'
+    DATA_DIR = 'stim/' + str(nt) + 'frames'
+    if input_shape[1] == 128 and input_shape[2] == 160:
+        DATA_DIR += '/'
+    else:
+        DATA_DIR += str(input_shape[1]) + 'x' + str(input_shape[2]) + '/'
     test_file = DATA_DIR + stim + '.hkl'
     test_sources = DATA_DIR + stim + '_source.hkl'
-
-    # model
-    data_format, test_model = create_test_model(json_file, weights_file, target)
 
     # data
     test_generator = SequenceGenerator(test_file, test_sources, nt,
