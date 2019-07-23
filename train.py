@@ -21,7 +21,7 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/190711_2/'
+WEIGHTS_DIR = './model/190711_29/'
 
 size = (128, 192)
 
@@ -69,7 +69,7 @@ k2 = s2
 
 A_filt_sizes = (k1, k1)
 Ahat_filt_sizes = (3, 3, 3)
-R_filt_sizes = (3, 3, 3)
+R_filt_sizes = (7, 7, 7)
 A_stride_sizes = (s1, s1)
 Ahat_stride_sizes = (1, 1, 1)
 R_stride_sizes = (1, 1, 1)

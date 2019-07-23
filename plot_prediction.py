@@ -28,7 +28,7 @@ _stim = 'MAE_P_'
 nt = pre_frames + stim_frames + post_frames
 
 if __name__ == '__main__':
-    SAVE_DIR = './response/190711_2/'
+    SAVE_DIR = './response/190711_29/'
 
     for target in ['E0', 'E1', 'E2', 'R0', 'R1', 'R2',
                    'A0', 'A1', 'A2', 'Ahat0', 'Ahat1', 'Ahat2']:
@@ -50,14 +50,14 @@ if __name__ == '__main__':
             fig = plt.figure(figsize=(20, 20))
 
             for i in range(min(100, n_neurons - n * 100)):
-                s = np.sqrt(len(resp_deg0))
+                # s = np.sqrt(len(resp_deg0))
                 idx = 100 * n + i
                 ax = plt.subplot(10, 10, i+1)
                 ax.errorbar(range(1, nt), np.mean(resp_deg0[:, :, idx], axis=0),
-                            yerr=np.std(resp_deg0[:, :, idx], axis=0) / s,
+                            # yerr=np.std(resp_deg0[:, :, idx], axis=0) / s,
                             c='m', alpha=0.7)
                 ax.errorbar(range(1, nt), np.mean(resp_deg180[:, :, idx], axis=0),
-                            yerr=np.std(resp_deg180[:, :, idx], axis=0) / s,
+                            # yerr=np.std(resp_deg180[:, :, idx], axis=0) / s,
                             c='c', alpha=0.7)
                 # ax.set_xlabel('Frames')
                 # ax.set_ylabel('Response')

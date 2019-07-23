@@ -20,8 +20,8 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/190711_2/'
-RESULTS_SAVE_DIR = './kitti_results/190711_2/'
+WEIGHTS_DIR = './model/190711_29/'
+RESULTS_SAVE_DIR = './kitti_results/190711_29/'
 
 n_plot = 40
 batch_size = 10
