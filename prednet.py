@@ -86,7 +86,9 @@ class PredNet(Recurrent):
         self.Ahat_stride_sizes = Ahat_stride_sizes
         assert len(R_stride_sizes) == (self.nb_layers), 'len(R_stride_sizes) must equal len(stack_sizes)'
         self.R_stride_sizes = R_stride_sizes
+        assert len(pool_size) == (self.nb_layers - 1), 'len(pool_size) must equal len(stack_sizes) - 1'
         self.pool_size = pool_size
+        assert len(upsample_size) == (self.nb_layers - 1), 'len(upsample_size) must equal len(stack_sizes) - 1'
         self.upsample_size = upsample_size
 
         self.pixel_max = pixel_max
@@ -156,10 +158,12 @@ class PredNet(Recurrent):
            states_to_pass.append('ahat')  # pass prediction in states so can use as actual for t+1 when extrapolating
            nlayers_to_pass['ahat'] = 1
         for u in states_to_pass:
+            ds_factor = 1
             for l in range(nlayers_to_pass[u]):
-                ds_factor = self.upsample_size ** l
                 nb_row = init_nb_row // ds_factor
                 nb_col = init_nb_col // ds_factor
+                if l < self.nb_layers - 1:
+                    ds_factor *= self.upsample_size[l]
                 if u in ['r', 'c']:
                     stack_size = self.R_stack_sizes[l]
                 elif u == 'e':
@@ -190,6 +194,8 @@ class PredNet(Recurrent):
     def build(self, input_shape):
         self.input_spec = [InputSpec(shape=input_shape)]
         self.conv_layers = {c: [] for c in ['i', 'f', 'c', 'o', 'a', 'ahat']}
+        self.upsample = []
+        self.pool = []
 
         for l in range(self.nb_layers):
             for c in ['i', 'f', 'c', 'o']:
@@ -217,16 +223,17 @@ class PredNet(Recurrent):
                                                     activation=self.A_activation,
                                                     data_format=self.data_format))
 
-        self.upsample = UpSampling2D((self.upsample_size, self.upsample_size),
-                                     data_format=self.data_format)
-        self.pool = MaxPooling2D((self.pool_size, self.pool_size),
-                                 data_format=self.data_format)
+        for l in range(self.nb_layers - 1):
+            self.upsample.append(UpSampling2D((self.upsample_size[l], self.upsample_size[l]),
+                                         data_format=self.data_format))
+            self.pool.append(MaxPooling2D((self.pool_size[l], self.pool_size[l]),
+                                     data_format=self.data_format))
 
         self.trainable_weights = []
         nb_row, nb_col = (input_shape[-2], input_shape[-1]) if self.data_format == 'channels_first' else (input_shape[-3], input_shape[-2])
         for c in sorted(self.conv_layers.keys()):
+            ds_factor = 1
             for l in range(len(self.conv_layers[c])):
-                ds_factor = 2 ** l
                 if c == 'ahat':
                     nb_channels = self.R_stack_sizes[l]
                 elif c == 'a':
@@ -236,6 +243,8 @@ class PredNet(Recurrent):
                     if l < self.nb_layers - 1:
                         nb_channels += self.R_stack_sizes[l+1]
                 in_shape = (input_shape[0], nb_channels, nb_row // ds_factor, nb_col // ds_factor)
+                if l < self.nb_layers - 1:
+                    ds_factor *= self.upsample_size[l]
                 if self.data_format == 'channels_last': in_shape = (in_shape[0], in_shape[2], in_shape[3], in_shape[1])
                 with K.name_scope('layer_' + c + '_' + str(l)):
                     self.conv_layers[c][l].build(in_shape)
@@ -276,7 +285,7 @@ class PredNet(Recurrent):
             r.insert(0, _r)
 
             if l > 0:
-                r_up = self.upsample.call(_r)
+                r_up = self.upsample[l - 1].call(_r)
 
         # Update feedforward path starting from the bottom
         for l in range(self.nb_layers):
@@ -303,7 +312,7 @@ class PredNet(Recurrent):
 
             if l < self.nb_layers - 1:
                 a = self.conv_layers['a'][l].call(e[l])
-                a = self.pool.call(a)  # target for next layer
+                a = self.pool[l].call(a)  # target for next layer
 
         if self.output_layer_type is None:
             if self.output_mode == 'prediction':
