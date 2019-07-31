@@ -28,7 +28,7 @@ _stim = 'MAE_P_'
 nt = pre_frames + stim_frames + post_frames
 
 if __name__ == '__main__':
-    SAVE_DIR = './response/190711_29/'
+    SAVE_DIR = './response/190724_9/'
 
     for target in ['E0', 'E1', 'E2', 'R0', 'R1', 'R2',
                    'A0', 'A1', 'A2', 'Ahat0', 'Ahat1', 'Ahat2']:
