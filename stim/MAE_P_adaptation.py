@@ -43,15 +43,15 @@ n_movies = 10
 pre_frames = 10
 stim_frames = 20 # 2, 4, 8, 16, 32 sec
 post_frames = 20
-deg = 0 # 0, 180
+deg = 180 # 0, 180
 
-nDots = 1300 # 2000, 2400, 1300
+nDots = 2600 # 2000, 2400, 1300
 maxSpeed = 40 # pixel/frame
-dotSize = 15
-winsize = (810, 1620) # (1280, 1600), (1280, 1920), (810, 1620)
+dotSize = 30
+winsize = (1920, 2240) # (1280, 1600), (1280, 1920), (810, 1620)
 limit = int(np.sqrt(winsize[0] ** 2 + winsize[1] ** 2))
 
-output_size = (81, 162) # (128, 160), (128, 192), (81, 162)
+output_size = (192, 224) # (128, 160), (128, 192), (81, 162)
 
 ############################ present stims  ##################################
 total_frames = pre_frames + stim_frames + post_frames

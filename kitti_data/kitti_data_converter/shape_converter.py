@@ -3,7 +3,7 @@ import hickle
 import numpy as np
 import cv2
 
-target_size = (128, 192)
+target_size = (192, 224)
 
 parent = '/export/public/ukita/prednet/kitti_data/'
 
