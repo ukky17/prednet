@@ -152,7 +152,7 @@ class PredNet(Recurrent):
         base_initial_state = K.sum(base_initial_state, axis=1)  # (samples, nb_channels)
 
         initial_states = []
-        states_to_pass = ['r', 'c', 'e']
+        states_to_pass = ['r', 'c', 'a']
         nlayers_to_pass = {u: self.nb_layers for u in states_to_pass}
         if self.extrap_start_time is not None:
            states_to_pass.append('ahat')  # pass prediction in states so can use as actual for t+1 when extrapolating
@@ -166,8 +166,8 @@ class PredNet(Recurrent):
                     ds_factor *= self.upsample_size[l]
                 if u in ['r', 'c']:
                     stack_size = self.R_stack_sizes[l]
-                elif u == 'e':
-                    stack_size = 2 * self.stack_sizes[l]
+                elif u == 'a':
+                    stack_size = self.stack_sizes[l]
                 elif u == 'ahat':
                     stack_size = self.stack_sizes[l]
                 output_size = stack_size * nb_row * nb_col  # flattened size
@@ -237,9 +237,9 @@ class PredNet(Recurrent):
                 if c == 'ahat':
                     nb_channels = self.R_stack_sizes[l]
                 elif c == 'a':
-                    nb_channels = 2 * self.stack_sizes[l]
+                    nb_channels = self.stack_sizes[l]
                 else:
-                    nb_channels = self.stack_sizes[l] * 2 + self.R_stack_sizes[l]
+                    nb_channels = self.stack_sizes[l] + self.R_stack_sizes[l]
                     if l < self.nb_layers - 1:
                         nb_channels += self.R_stack_sizes[l+1]
                 in_shape = (input_shape[0], nb_channels, nb_row // ds_factor, nb_col // ds_factor)
@@ -259,7 +259,7 @@ class PredNet(Recurrent):
     def step(self, a, states):
         r_tm1 = states[:self.nb_layers]
         c_tm1 = states[self.nb_layers:2*self.nb_layers]
-        e_tm1 = states[2*self.nb_layers:3*self.nb_layers]
+        a_tm1 = states[2*self.nb_layers:3*self.nb_layers]
 
         if self.extrap_start_time is not None:
             t = states[-1]
@@ -268,10 +268,11 @@ class PredNet(Recurrent):
         c = []
         r = []
         e = []
+        aa = [a] # a, avoid confusion sith `a`
 
         # Update R units starting from the top
         for l in reversed(range(self.nb_layers)):
-            inputs = [r_tm1[l], e_tm1[l]]
+            inputs = [r_tm1[l], a_tm1[l]]
             if l < self.nb_layers - 1:
                 inputs.append(r_up)
 
@@ -311,8 +312,9 @@ class PredNet(Recurrent):
                     output = e[l]
 
             if l < self.nb_layers - 1:
-                a = self.conv_layers['a'][l].call(e[l])
+                a = self.conv_layers['a'][l].call(a)
                 a = self.pool[l].call(a)  # target for next layer
+                aa.append(a)
 
         if self.output_layer_type is None:
             if self.output_mode == 'prediction':
@@ -326,7 +328,7 @@ class PredNet(Recurrent):
                 else:
                     output = K.concatenate((K.batch_flatten(frame_prediction), all_error), axis=-1)
 
-        states = r + c + e
+        states = r + c + aa
         if self.extrap_start_time is not None:
             states += [frame_prediction, t + 1]
         return output, states
