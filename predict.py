@@ -63,12 +63,10 @@ if __name__ == '__main__':
     # params
     parser = argparse.ArgumentParser()
     parser.add_argument('--nt', type=int, default=50)
-
-    parser.add_argument('--target', type=str, default='E0')
-    parser.add_argument('--stim', type=str, default='MAE_P_deg0',
-                        help='MAE_P_deg0, MAE_P_deg180 or OF_R_out, OF_R_in')
-    parser.add_argument('--SAVE_DIR', type=str, default='./response/190724_11/')
-    parser.add_argument('--WEIGHTS_DIR', type=str, default='./model/190724_11/')
+    parser.add_argument('--target', type=str)
+    parser.add_argument('--stim', type=str)
+    parser.add_argument('--SAVE_DIR', type=str)
+    parser.add_argument('--WEIGHTS_DIR', type=str)
 
     args = parser.parse_args()
     nt = args.nt
