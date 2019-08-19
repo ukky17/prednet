@@ -43,7 +43,7 @@ n_movies = 10
 pre_frames = 10
 stim_frames = 20 # 2, 4, 8, 16, 32 sec
 post_frames = 20
-deg = 180 # 0, 180
+deg = 0 # 0, 180, 90, or 270
 
 nDots = 2600 # 2000, 2400, 1300
 maxSpeed = 40 # pixel/frame
