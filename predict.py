@@ -8,6 +8,8 @@ os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 import numpy as np
 from six.moves import cPickle
 import hickle
+from tqdm import tqdm
+import gc
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -92,35 +94,48 @@ if __name__ == '__main__':
         DATA_DIR += '/'
     else:
         DATA_DIR += str(input_shape[1]) + 'x' + str(input_shape[2]) + '/'
-    test_file = DATA_DIR + stim + '.hkl'
-    test_sources = DATA_DIR + stim + '_source.hkl'
 
     # data
-    test_generator = SequenceGenerator(test_file, test_sources, nt,
-                                       sequence_start_mode='unique',
-                                       data_format=data_format)
-    X_test = test_generator.create_all()
+    n_movies = 100
+    batch_size = 5
 
-    # create permuted data
-    X_test_permuted = np.zeros_like(X_test)
-    p = np.random.permutation(X_test.shape[0] * X_test.shape[1])
-    p = p.reshape(X_test.shape[:2])
-    for i in range(X_test.shape[0]):
-        for j in range(X_test.shape[1]):
-            _p = p[i, j]
-            X_test_permuted[i, j, ::] = X_test[_p // X_test.shape[1],
-                                               _p % X_test.shape[1], ::]
+    for n in tqdm(range(n_movies // batch_size)):
+        test_file =    DATA_DIR + stim + '_' + str(n) + '.hkl'
+        test_sources = DATA_DIR + stim + '_' + str(n) + '_source.hkl'
 
-    # predict
-    X_hat = test_model.predict(X_test)
-    X_hat_permuted = test_model.predict(X_test_permuted)
-    if data_format == 'channels_first':
-        X_test = np.transpose(X_test, (0, 1, 3, 4, 2))
-        X_test_permuted = np.transpose(X_test_permuted, (0, 1, 3, 4, 2))
-        X_hat = np.transpose(X_hat, (0, 1, 3, 4, 2))
-        X_hat_permuted = np.transpose(X_hat_permuted, (0, 1, 3, 4, 2))
+        # load the movie
+        test_generator = SequenceGenerator(test_file, test_sources, nt,
+                                           sequence_start_mode='unique',
+                                           data_format=data_format,
+                                           batch_size=batch_size)
+        X_test = test_generator.create_all()
 
-    hickle.dump(X_hat, SAVE_DIR + stim + '_' + target + '.hkl',
-                mode='w')
-    hickle.dump(X_hat_permuted, SAVE_DIR + stim + '_' + target + '_permuted.hkl',
-                mode='w')
+        # feed
+        X_hat = test_model.predict(X_test)
+        if data_format == 'channels_first':
+            X_hat = np.transpose(X_hat, (0, 1, 3, 4, 2))
+
+        """
+        # create the permuted movie
+        X_test_permuted = np.zeros_like(X_test)
+        p = np.random.permutation(X_test.shape[0] * X_test.shape[1])
+        p = p.reshape(X_test.shape[:2])
+        for i in range(X_test.shape[0]):
+            for j in range(X_test.shape[1]):
+                _p = p[i, j]
+                X_test_permuted[i, j, ::] = X_test[_p // X_test.shape[1],
+                                                   _p % X_test.shape[1], ::]
+
+        X_hat_permuted = test_model.predict(X_test_permuted)
+        if data_format == 'channels_first':
+            X_hat_permuted = np.transpose(X_hat_permuted, (0, 1, 3, 4, 2))
+        """
+
+        del X_test
+        # del X_test_permuted
+        gc.collect()
+
+        hickle.dump(X_hat, SAVE_DIR + stim + '_' + target + '_' + str(n) + '.hkl',
+                    mode='w')
+        # hickle.dump(X_hat_permuted, SAVE_DIR + stim + '_' + target + '_' + \
+        #             str(n) + '_permuted.hkl', mode='w')
