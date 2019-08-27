@@ -20,12 +20,12 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/190813_1/'
-RESULTS_SAVE_DIR = './kitti_results/190813_1/'
+WEIGHTS_DIR = './model/190826_1/'
+RESULTS_SAVE_DIR = './kitti_results/190826_1/'
 
 n_plot = 40
 batch_size = 10
-nt = 50
+nt = 10
 
 os.makedirs(RESULTS_SAVE_DIR)
 weights_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_weights.hdf5')

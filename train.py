@@ -21,7 +21,7 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/190813_1/'
+WEIGHTS_DIR = './model/190826_1/'
 
 size = (192, 224)
 
@@ -72,7 +72,7 @@ pool_size = (2, 4)
 upsample_size = tuple(A_stride_sizes[i] * pool_size[i] for i in range(len(A_stride_sizes)))
 layer_loss_weights = np.array([1, 0, 0])  # weighting for each layer in final loss; "L_0" model:  [1, 0, 0, 0], "L_all": [1, 0.1, 0.1, 0.1]
 layer_loss_weights = np.expand_dims(layer_loss_weights, 1)
-nt = 50  # number of timesteps used for sequences in training
+nt = 10  # number of timesteps used for sequences in training
 time_loss_weights = 1./ (nt - 1) * np.ones((nt,1))  # equally weight all timesteps except the first
 time_loss_weights[0] = 0
 
