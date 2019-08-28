@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
     # data
     n_movies = 100
-    batch_size = 5
+    batch_size = 1
 
     for n in tqdm(range(n_movies // batch_size)):
         test_file =    DATA_DIR + stim + '_' + str(n) + '.hkl'

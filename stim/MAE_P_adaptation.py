@@ -40,7 +40,7 @@ def create_circles(dotsX, dotsY):
 
 # stim parameters ------------------------------------------------------------
 n_movies = 100
-batch_size = 5
+batch_size = 1
 
 pre_frames = 50
 stim_frames = 80 # 2, 4, 8, 16, 32 sec
