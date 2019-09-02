@@ -13,6 +13,7 @@ response/
 *.hkl
 *.npy
 *.mp4
+*.ipynb
 
 # Distribution / packaging
 .Python
