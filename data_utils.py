@@ -17,7 +17,7 @@ class SequenceGenerator(Iterator):
         self.data_format = data_format
         assert sequence_start_mode in {'all', 'unique'}, 'sequence_start_mode must be in {all, unique}'
         self.sequence_start_mode = sequence_start_mode
-        assert output_mode in {'error', 'prediction'}, 'output_mode must be in {error, prediction}'
+        assert output_mode in {'error', 'prediction', 'convlstm'}, 'output_mode must be in {error, prediction, convlstm}'
         self.output_mode = output_mode
 
         if self.data_format == 'channels_first':
@@ -65,6 +65,10 @@ class SequenceGenerator(Iterator):
             batch_y = np.zeros(current_batch_size, np.float32)
         elif self.output_mode == 'prediction':  # output actual pixels
             batch_y = batch_x
+        elif self.output_mode == 'convlstm':
+            _batch_x = np.copy(batch_x)
+            batch_x = _batch_x[:, :-1, ::]
+            batch_y = _batch_x[:, 1:, ::]
         return batch_x, batch_y
 
     def preprocess(self, X):
