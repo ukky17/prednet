@@ -21,7 +21,7 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/190828_1/'
+WEIGHTS_DIR = './model/190902_1/'
 
 size = (192, 224)
 
@@ -76,7 +76,7 @@ nt = 10  # number of timesteps used for sequences in training
 time_loss_weights = 1./ (nt - 1) * np.ones((nt,1))  # equally weight all timesteps except the first
 time_loss_weights[0] = 0
 
-
+# K.set_learning_phase(1) # for bn
 prednet = PredNet(stack_sizes, R_stack_sizes,
                   A_filt_sizes, Ahat_filt_sizes, R_filt_sizes,
                   A_stride_sizes, Ahat_stride_sizes, R_stride_sizes, pool_size, upsample_size,

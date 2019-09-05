@@ -20,8 +20,8 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/190828_1/'
-RESULTS_SAVE_DIR = './kitti_results/190828_1/'
+WEIGHTS_DIR = './model/190902_15/'
+RESULTS_SAVE_DIR = './kitti_results/190902_15/'
 
 n_plot = 40
 batch_size = 10
@@ -32,6 +32,7 @@ weights_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_weights.hdf5')
 json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
 
 # Load trained model
+# K.set_learning_phase(0) # for bn
 f = open(json_file, 'r')
 json_string = f.read()
 f.close()

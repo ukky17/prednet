@@ -82,6 +82,7 @@ if __name__ == '__main__':
         os.makedirs(SAVE_DIR)
 
     # get the model path
+    # K.set_learning_phase(0) # for bn
     json_file = os.path.join(WEIGHTS_DIR, 'prednet_kitti_model.json')
     weights_file = WEIGHTS_DIR + 'prednet_kitti_weights.hdf5'
 
