@@ -50,7 +50,7 @@ class SequenceGenerator(Iterator):
     def next(self):
         with self.lock:
             v = tf.__version__.split('.')
-            if int(v[0]) > 1 or int(v[1]) > 4:
+            if int(v[0]) > 1 or int(v[1]) >= 4:
                 # TF >= 1.4.0
                 current_index = (self.batch_index * self.batch_size) % self.n
                 index_array, current_batch_size = next(self.index_generator), self.batch_size
