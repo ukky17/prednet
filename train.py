@@ -21,7 +21,7 @@ from data_utils import SequenceGenerator
 
 # path
 DATA_DIR = './kitti_data/'
-WEIGHTS_DIR = './model/190902_1/'
+WEIGHTS_DIR = './model/190902_8/'
 
 size = (192, 224)
 
