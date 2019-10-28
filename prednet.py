@@ -2,10 +2,27 @@ import numpy as np
 
 from keras import backend as K
 from keras import activations
-from keras.layers import Recurrent
+from keras import regularizers
+from keras.regularizers import Regularizer
+from keras.layers import Recurrent, Activation
 from keras.layers import Conv2D, UpSampling2D, MaxPooling2D
+from keras.layers.normalization import BatchNormalization
 from keras.engine import InputSpec
 from keras_utils import legacy_prednet_support
+
+def kl_divergence(rho, rho_hat):
+    return rho * K.log(rho / rho_hat) + (1 - rho) * K.log((1 - rho) / (1 - rho_hat))
+
+class SparsityRegularizer(Regularizer):
+    def __init__(self, target=0.1, coef=1.0):
+        self.target = target
+        self.coef = coef
+
+    def __call__(self, x):
+        return self.coef * K.sum(kl_divergence(self.target, K.mean(x, axis=0)))
+
+    def get_config(self):
+        return {"name": self.__class__.__name__}
 
 class PredNet(Recurrent):
     '''PredNet architecture - Lotter 2016.
@@ -205,6 +222,7 @@ class PredNet(Recurrent):
                                                   strides=self.R_stride_sizes[l],
                                                   padding='same',
                                                   activation=act,
+                                                  # activity_regularizer=SparsityRegularizer,
                                                   data_format=self.data_format))
 
             act = 'relu' if l == 0 else self.A_activation
@@ -213,6 +231,7 @@ class PredNet(Recurrent):
                                                    strides=self.Ahat_stride_sizes[l],
                                                    padding='same',
                                                    activation=act,
+                                                   # activity_regularizer=SparsityRegularizer,
                                                    data_format=self.data_format))
 
             if l < self.nb_layers - 1:
@@ -221,6 +240,7 @@ class PredNet(Recurrent):
                                                     strides=self.A_stride_sizes[l],
                                                     padding='same',
                                                     activation=self.A_activation,
+                                                    # activity_regularizer=SparsityRegularizer,
                                                     data_format=self.data_format))
 
         for l in range(self.nb_layers - 1):
