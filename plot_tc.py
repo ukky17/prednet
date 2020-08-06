@@ -67,6 +67,7 @@ def is_flat_old(_resp):
 def is_flat(_resp):
     """
     _resp: (2, n_movies, nt)
+    check flatness of the timecourse by `mean > SD`
     """
 
     # responsiveness
@@ -77,6 +78,7 @@ def is_flat(_resp):
 def is_flat2(_resp, corr_n=2128896):
     """
     _resp: (2, n_movies, nt)
+    check flatness of the timecourse by `p-value < 0.05`
 
     total units:
     (E1, E2, A1, A2, Ahat1, Ahat2)
@@ -143,7 +145,7 @@ for target in targets:
 
     idxs = np.random.permutation(list(range(n_units)))
 
-    # plot
+    # flatness
     i = 0
     count = 0
     responsive_idxs = []
