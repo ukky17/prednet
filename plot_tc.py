@@ -109,12 +109,12 @@ pre_frames = 10 # 50
 stim_frames = 20 # 80
 post_frames = 20 # 100
 
-n_movies = 100
+n_movies = 1000
 batch_size = 1
 n_stims = 2
 n_cells_to_plot = 100
 
-SAVE_DIR = './response/190724_11/'
+SAVE_DIR = './response/200806_1/'
 
 # targets = ['E0', 'E1', 'E2', 'R0', 'R1', 'R2', 'A0', 'A1', 'A2', 'Ahat0', 'Ahat1', 'Ahat2']
 # targets = ['E0', 'E1', 'E2', 'A0', 'A1', 'A2', 'Ahat0', 'Ahat1', 'Ahat2']
@@ -131,27 +131,34 @@ for target in targets:
         resp_deg180 = hickle.load(SAVE_DIR + 'MAE_P_deg180_' + target + '_' + str(n) + '.hkl')
 
         if n == 0:
-            resp = np.zeros((n_stims, n_movies, ) + resp_deg0.shape[1:]) # (2, 100, 230, 12, 14, 192)
+            n_units = resp_deg0.shape[2] * resp_deg0.shape[3] * resp_deg0.shape[4]
+            nt = resp_deg0.shape[1]
+
+            # randomly sample 10%
+            n_units2 = n_units // 10
+            idxs = np.random.permutation(list(range(n_units)))[:n_units2]
+            resp = np.zeros((n_stims, n_movies, nt, n_units2))
+
+        resp_deg0 = resp_deg0.reshape((batch_size, nt, n_units))
+        resp_deg180 = resp_deg180.reshape((batch_size, nt, n_units))
+
+        resp_deg0 = resp_deg0[:, :, idxs] # (batch_size, nt, n_units2)
+        resp_deg180 = resp_deg180[:, :, idxs]
 
         resp[0, n * batch_size: (n+1) * batch_size] = resp_deg0
         resp[1, n * batch_size: (n+1) * batch_size] = resp_deg180
 
     # reshape
-    n_units = resp.shape[3] * resp.shape[4] * resp.shape[5]
-    nt = resp.shape[2]
-    resp = resp.reshape((n_stims, n_movies, nt, n_units))
     print(target)
-    print(resp.shape) # (2, 100, 230, n_units)
-
-    idxs = np.random.permutation(list(range(n_units)))
+    print(resp.shape) # (2, 100, 230, n_units2)
 
     # flatness
     i = 0
     count = 0
     responsive_idxs = []
-    while count < 100 and i < n_units:
-        if not is_flat2(resp[:, :, :, idxs[i]]):
-            responsive_idxs.append(idxs[i])
+    while count < n_cells_to_plot and i < n_units2:
+        if not is_flat2(resp[:, :, :, i]):
+            responsive_idxs.append(i)
         i += 1
 
     # plot
