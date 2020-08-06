@@ -2,7 +2,7 @@ import os
 import argparse
 
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
-os.environ["CUDA_VISIBLE_DEVICES"]="0"
+os.environ["CUDA_VISIBLE_DEVICES"]="3"
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import numpy as np
@@ -94,10 +94,10 @@ if __name__ == '__main__':
     if input_shape[1] == 128 and input_shape[2] == 160:
         DATA_DIR += '/'
     else:
-        DATA_DIR += str(input_shape[1]) + 'x' + str(input_shape[2]) + '/'
+        DATA_DIR += str(input_shape[1]) + 'x' + str(input_shape[2]) + '_1000trials/'
 
     # data
-    n_movies = 100
+    n_movies = 1000
     batch_size = 1
 
     for n in tqdm(range(n_movies // batch_size)):

@@ -39,12 +39,12 @@ def create_circles(dotsX, dotsY):
     return field
 
 # stim parameters ------------------------------------------------------------
-n_movies = 100
+n_movies = 1000
 batch_size = 1
 
-pre_frames = 50
-stim_frames = 80 # 2, 4, 8, 16, 32 sec
-post_frames = 100
+pre_frames = 10
+stim_frames = 20 # 2, 4, 8, 16, 32 sec
+post_frames = 20
 deg = 0 # 0, 180, 90, or 270
 
 nDots = 2600 # 2000, 2400, 1300
@@ -62,7 +62,8 @@ filename_base = str(total_frames) + 'frames'
 if output_size == (128, 160):
     filename_base += '/MAE_P_deg' + str(deg)
 else:
-    filename_base += str(output_size[0]) + 'x' + str(output_size[1]) + '/MAE_P_deg' + str(deg)
+    # filename_base += str(output_size[0]) + 'x' + str(output_size[1]) + '/MAE_P_deg' + str(deg)
+    filename_base += str(output_size[0]) + 'x' + str(output_size[1]) + '_1000trials/MAE_P_deg' + str(deg)
 
 movie_filename = filename_base + '.mp4'
 fourcc = cv2.VideoWriter_fourcc('m','p','4','v')
