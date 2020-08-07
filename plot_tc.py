@@ -119,6 +119,7 @@ SAVE_DIR = './response/200806_1/'
 # targets = ['E0', 'E1', 'E2', 'R0', 'R1', 'R2', 'A0', 'A1', 'A2', 'Ahat0', 'Ahat1', 'Ahat2']
 # targets = ['E0', 'E1', 'E2', 'A0', 'A1', 'A2', 'Ahat0', 'Ahat1', 'Ahat2']
 targets = ['E1', 'E2', 'A1', 'A2', 'Ahat1', 'Ahat2']
+# targets = ['Ahat1', 'Ahat2']
 # targets = ['E2', 'A2', 'Ahat2', 'R2']
 # targets = ['E0', 'A0', 'Ahat0']
 # taregets = ['E1', 'A1', 'Ahat1']
